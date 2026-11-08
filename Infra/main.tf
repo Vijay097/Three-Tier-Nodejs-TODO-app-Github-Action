@@ -144,7 +144,7 @@ resource "aws_security_group" "db" {
   }
 }
 
-# ==========================================
+/*# ==========================================
 # DAYS 8 & 9: ENCRYPTED RDS POSTGRES & SECRETS
 # ==========================================
 resource "random_password" "db_password" {
@@ -202,9 +202,9 @@ resource "aws_ecr_repository" "frontend" {
 
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"
-}
+}*/
 
-# ==========================================
+/*# ==========================================
 # APPLICATION ROLE PERMISSIONS
 # ==========================================
 resource "aws_iam_role" "ecs_execution_role" {
@@ -436,4 +436,4 @@ container_name   = "frontend"
 container_port   = 80
 }
 depends_on = [aws_lb_listener.http]
-}
+}*/
