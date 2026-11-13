@@ -86,6 +86,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
           echo "frontend_image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Download current ECS Task Definitions
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_SERVICE_BACKEND }} \
+            --query taskDefinition > backend-task-def.json
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_SERVICE_FRONTEND }} \
+            --query taskDefinition > frontend-task-def.json
+
       - name: Fill in the new image ID in the Amazon ECS task definition backend
         id: task-def-backend
         uses: aws-actions/amazon-ecs-render-task-definition@v1
