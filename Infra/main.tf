@@ -497,7 +497,7 @@ task_definition = aws_ecs_task_definition.backend.arn
 lifecycle {
   ignore_changes = [task_definition]
 }
-desired_count   = 0
+desired_count   = 1
 launch_type     = "FARGATE"
 network_configuration {
 subnets         = aws_subnet.priv[*].id
@@ -518,7 +518,7 @@ task_definition = aws_ecs_task_definition.frontend.arn
 lifecycle {
   ignore_changes = [task_definition]
 }
-desired_count   = 0
+desired_count   = 1
 launch_type     = "FARGATE"
 network_configuration {
 subnets          = aws_subnet.pub[*].id
