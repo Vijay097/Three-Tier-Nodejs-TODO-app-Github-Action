@@ -1,0 +1,8 @@
+terraform-provider-aws_v5.100.0_x5.exe
+terraform.*state
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+.env
+node_modules/

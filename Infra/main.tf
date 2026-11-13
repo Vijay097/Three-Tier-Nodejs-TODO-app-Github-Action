@@ -144,7 +144,7 @@ resource "aws_security_group" "db" {
   }
 }
 
-/*# ==========================================
+# ==========================================
 # DAYS 8 & 9: ENCRYPTED RDS POSTGRES & SECRETS
 # ==========================================
 resource "random_password" "db_password" {
@@ -202,9 +202,9 @@ resource "aws_ecr_repository" "frontend" {
 
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"
-}*/
+}
 
-/*# ==========================================
+# ==========================================
 # APPLICATION ROLE PERMISSIONS
 # ==========================================
 resource "aws_iam_role" "ecs_execution_role" {
@@ -406,7 +406,10 @@ resource "aws_ecs_service" "backend" {
 name            = "${var.app_name}-backend"
 cluster         = aws_ecs_cluster.main.id
 task_definition = aws_ecs_task_definition.backend.arn
-desired_count   = 1
+lifecycle {
+  ignore_changes = [task_definition]
+}
+desired_count   = 0
 launch_type     = "FARGATE"
 network_configuration {
 subnets         = aws_subnet.priv[*].id
@@ -418,12 +421,16 @@ container_name   = "backend"
 container_port   = 5000
 }
 depends_on = [aws_lb_listener.http, aws_db_instance.postgres]
+
 }
 resource "aws_ecs_service" "frontend" {
 name            = "${var.app_name}-frontend"
 cluster         = aws_ecs_cluster.main.id
 task_definition = aws_ecs_task_definition.frontend.arn
-desired_count   = 1
+lifecycle {
+  ignore_changes = [task_definition]
+}
+desired_count   = 0
 launch_type     = "FARGATE"
 network_configuration {
 subnets          = aws_subnet.pub[*].id
@@ -436,4 +443,4 @@ container_name   = "frontend"
 container_port   = 80
 }
 depends_on = [aws_lb_listener.http]
-}*/
+}
