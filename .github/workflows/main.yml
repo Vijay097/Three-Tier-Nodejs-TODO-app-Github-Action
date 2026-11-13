@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY_frontend: MY_ECR_REPOSITORY
-  ECR_REPOSITORY_backend: MY_ECR_REPOSITORY# set this to your Amazon ECR repository name
+  ECR_REPOSITORY_backend: MY_ECR_REPOSITORY # set this to your Amazon ECR repository name
   ECS_SERVICE_frontend: MY_ECS_SERVICE
   ECS_SERVICE_backend: MY_ECS_SERVICE# set this to your Amazon ECS service name
   ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
@@ -51,11 +51,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}   # Generate a token on Sonarcloud.io, add it to the secrets of this repo with the name SONAR_TOKEN (Settings > Secrets > Actions > add new repository secret)
         with:
           # Additional arguments for the SonarScanner CLI
-          args:
+          args: |
             # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
             # mandatory
-            -Dsonar.projectKey=
-            -Dsonar.organization=
+            -Dsonar.projectKey=todoapp
+            -Dsonar.organization=todoapp
           projectBaseDir: .
 
       - name: Configure AWS Credentials via OIDC
@@ -98,7 +98,7 @@ jobs:
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION_frontend }}
           container-name: ${{ env.CONTAINER_NAME_frontend }}
-          image: ${{ steps.build-image.outputs.front_image }}
+          image: ${{ steps.build-image.outputs.frontend_image }}
           
 
       - name: Deploy Amazon ECS task definition
