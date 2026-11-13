@@ -7,13 +7,13 @@ on:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}                  # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY_FRONTEND: ${{ vars.ECR_REPOSITORY_frontend }}
-  ECR_REPOSITORY_BACKEND: ${{ vars.ECR_REPOSITORY_backend }} # set this to your Amazon ECR repository name
-  ECS_SERVICE_FRONTEND: ${{ vars.ECS_SERVICE_frontend }}
-  ECS_SERVICE_BACKEND: ${{ vars.ECS_SERVICE_backend }} # set this to your Amazon ECS service name
+  ECR_REPOSITORY_FRONTEND: ${{ vars.ECR_REPOSITORY_FRONTEND }}
+  ECR_REPOSITORY_BACKEND: ${{ vars.ECR_REPOSITORY_BACKEND }} # set this to your Amazon ECR repository name
+  ECS_SERVICE_FRONTEND: ${{ vars.ECS_SERVICE_FRONTEND }}
+  ECS_SERVICE_BACKEND: ${{ vars.ECS_SERVICE_BACKEND }} # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION_FRONTEND: MY_ECS_TASK_DEFINITION
-  ECS_TASK_DEFINITION_BACKEND: MY_ECS_TASK_DEFINITION# set this to the path to your Amazon ECS task definition
+  ECS_TASK_DEFINITION_BACKEND: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME_frontend: frontend
   CONTAINER_NAME_backend: backend
@@ -54,8 +54,8 @@ jobs:
           args: |
             # Unique keys of your project and organization. You can find them in SonarCloud > Information (bottom-left menu)
             # mandatory
-            -Dsonar.projectKey=todoapp
-            -Dsonar.organization=todoapp
+            -Dsonar.projectKey=todo-app
+            -Dsonar.organization=todo-app
           projectBaseDir: .
 
       - name: Configure AWS Credentials via OIDC
@@ -79,18 +79,18 @@ jobs:
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_backend:$IMAGE_TAG ./backend
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_backend:$IMAGE_TAG
-          echo "backend_image=$ECR_REGISTRY/$ECR_REPOSITORY_backend:$IMAGE_TAG" >> $GITHUB_OUTPUT
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_frontend:$IMAGE_TAG ./frontend
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_frontend:$IMAGE_TAG
-          echo "frontend_image=$ECR_REGISTRY/$ECR_REPOSITORY_frontend:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG ./backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+          echo "backend_image=$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG ./frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+          echo "frontend_image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Fill in the new image ID in the Amazon ECS task definition backend
         id: task-def-backend
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION_backend }}
+          task-definition: ${{ env.ECS_TASK_DEFINITION_BACKEND }}
           container-name: ${{ env.CONTAINER_NAME_backend }}
           image: ${{ steps.build-image.outputs.backend_image }}
           
@@ -98,7 +98,7 @@ jobs:
         id: task-def-frontend
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION_frontend }}
+          task-definition: ${{ env.ECS_TASK_DEFINITION_FRONTEND }}
           container-name: ${{ env.CONTAINER_NAME_frontend }}
           image: ${{ steps.build-image.outputs.frontend_image }}
           
@@ -107,7 +107,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def-backend.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE_backend }}
+          service: ${{ env.ECS_SERVICE_BACKEND }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true  
 
@@ -115,7 +115,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def-frontend.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE_frontend }}
+          service: ${{ env.ECS_SERVICE_FRONTEND }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true 
 
