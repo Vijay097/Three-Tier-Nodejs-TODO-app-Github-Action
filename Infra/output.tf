@@ -1,4 +1,4 @@
-/*output "load_balancer_dns" {
+output "load_balancer_dns" {
   value       = aws_lb.main.dns_name
   description = "Open this address in a browser to see your running frontend app."
 }
@@ -11,4 +11,7 @@ output "ecr_backend_url" {
 output "ecr_frontend_url" {
   value       = aws_ecr_repository.frontend.repository_url
   description = "The target Amazon ECR registry string for tagging and building the web static UI image."
-}*/
+}
+output "github_actions_role_arn" {
+  value = aws_iam_role.github_actions.arn
+}

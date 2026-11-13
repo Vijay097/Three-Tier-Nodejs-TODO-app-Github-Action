@@ -21,3 +21,9 @@ variable "db_username" {
   description = "The master administrative username for the RDS database."
   default     = "cloudadmin"
 }
+
+variable "github_repo" {
+  description = "GitHub repository in owner/repo format"
+  type        = string
+  default     = "Vijay097/Three-Tier-Nodejs-TODO-app-Github-Action.git"
+}

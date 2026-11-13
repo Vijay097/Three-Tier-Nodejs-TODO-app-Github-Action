@@ -255,6 +255,94 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
+# 1. Register GitHub as an OIDC Identity Provider in AWS
+resource "aws_iam_openid_connect_provider" "github" {
+  url             = "https://githubusercontent.com"
+  client_id_list  = ["://amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1", "1c58a3a8518e8759bf075b76b750d4f2df264fcd"]
+}
+
+# 2. Create the IAM Role restricted strictly to your repository's main branch
+resource "aws_iam_role" "github_actions" {
+  name = "GitHubActionsDeployRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "://githubusercontent.com:aud" = "://amazonaws.com"
+            "://githubusercontent.com:sub" = "repo:${var.github_repo}:ref:refs/heads/main"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# 3. Least-Privilege Permissions for ECR Image Push & ECS Deployment
+resource "aws_iam_policy" "github_actions_deploy" {
+  name        = "${var.app_name}-github-deploy-policy"
+  description = "Allow GitHub Actions to push to ECR and deploy ECS services"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["ecr:GetAuthorizationToken"]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+        Resource = [
+          aws_ecr_repository.backend.arn,
+          aws_ecr_repository.frontend.arn
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition",
+          "ecs:UpdateService",
+          "ecs:DescribeServices"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = ["iam:PassRole"]
+        Resource = [
+          aws_iam_role.ecs_execution_role.arn,
+          aws_iam_role.ecs_task_role.arn
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_attach" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.github_actions_deploy.arn
+}
+
+# Output the Role ARN to copy into GitHub Secrets
+
+
 # ==========================================
 # DAY 15: RUNTIME TELEMETRY TRACKING
 # ==========================================
