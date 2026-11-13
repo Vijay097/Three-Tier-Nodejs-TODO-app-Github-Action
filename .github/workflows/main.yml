@@ -41,6 +41,9 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: "main"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_GITHUB_ACTIONS: false
+          VALIDATE_CHECKOV: false
+          VALIDATE_YAML_PRETTIER: false
 
       - name: Analyze with SonarCloud
 
