@@ -6,14 +6,14 @@ on:
       - main
 
 env:
-  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY_frontend: MY_ECR_REPOSITORY
-  ECR_REPOSITORY_backend: MY_ECR_REPOSITORY # set this to your Amazon ECR repository name
-  ECS_SERVICE_frontend: MY_ECS_SERVICE
-  ECS_SERVICE_backend: MY_ECS_SERVICE# set this to your Amazon ECS service name
-  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION_frontend: MY_ECS_TASK_DEFINITION
-  ECS_TASK_DEFINITION_backend: MY_ECS_TASK_DEFINITION# set this to the path to your Amazon ECS task definition
+  AWS_REGION: ${{ vars.AWS_REGION }}                  # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY_FRONTEND: ${{ vars.ECR_REPOSITORY_frontend }}
+  ECR_REPOSITORY_BACKEND: ${{ vars.ECR_REPOSITORY_backend }} # set this to your Amazon ECR repository name
+  ECS_SERVICE_FRONTEND: ${{ vars.ECS_SERVICE_frontend }}
+  ECS_SERVICE_BACKEND: ${{ vars.ECS_SERVICE_backend }} # set this to your Amazon ECS service name
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION_FRONTEND: MY_ECS_TASK_DEFINITION
+  ECS_TASK_DEFINITION_BACKEND: MY_ECS_TASK_DEFINITION# set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME_frontend: frontend
   CONTAINER_NAME_backend: backend
@@ -60,8 +60,10 @@ jobs:
 
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
+        env:
+          Account_ID: ${{secrets.Account_ID}}
         with:
-          role-to-assume: arn:aws:iam::<YOUR_ACCOUNT_ID>:role/GitHubActionsDeployRole
+          role-to-assume: arn:aws:iam::${{ env.Account_ID }}:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
