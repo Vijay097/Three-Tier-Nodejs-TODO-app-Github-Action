@@ -27,5 +27,5 @@ variable "db_username" {
 variable "github_repo" {
   description = "GitHub repository in owner/repo format"
   type        = string
-  default     = "Vijay097/Three-Tier-Nodejs-TODO-app-Github-Action.git"
+  default     = "Vijay097/Three-Tier-Nodejs-TODO-app-Github-Action"
 }

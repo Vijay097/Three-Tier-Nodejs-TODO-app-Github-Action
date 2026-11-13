@@ -257,12 +257,12 @@ resource "aws_iam_role" "ecs_task_role" {
 
 # 1. Register GitHub as an OIDC Identity Provider in AWS
 resource "aws_iam_openid_connect_provider" "github" {
-  url             = "https://githubusercontent.com"
-  client_id_list  = ["://amazonaws.com"]
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1", "1c58a3a8518e8759bf075b76b750d4f2df264fcd"]
 }
 
-# 2. Create the IAM Role restricted strictly to your repository's main branch
+# 2. Create the IAM Role with sts:TagSession and the full OIDC condition keys
 resource "aws_iam_role" "github_actions" {
   name = "GitHubActionsDeployRole"
 
@@ -274,11 +274,14 @@ resource "aws_iam_role" "github_actions" {
         Principal = {
           Federated = aws_iam_openid_connect_provider.github.arn
         }
-        Action = "sts:AssumeRoleWithWebIdentity"
+        Action = [
+          "sts:AssumeRoleWithWebIdentity",
+          "sts:TagSession"
+        ]
         Condition = {
           StringEquals = {
-            "://githubusercontent.com:aud" = "://amazonaws.com"
-            "://githubusercontent.com:sub" = "repo:${var.github_repo}:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repo}:ref:refs/heads/main"
           }
         }
       }
