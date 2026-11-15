@@ -12,8 +12,8 @@ env:
   ECS_SERVICE_FRONTEND: ${{ vars.ECS_SERVICE_FRONTEND }}
   ECS_SERVICE_BACKEND: ${{ vars.ECS_SERVICE_BACKEND }} # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION_FRONTEND: MY_ECS_TASK_DEFINITION
-  ECS_TASK_DEFINITION_BACKEND: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+  ECS_TASK_DEFINITION_FRONTEND: frontend-task-def.json
+  ECS_TASK_DEFINITION_BACKEND: backend-task-def.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME_frontend: frontend
   CONTAINER_NAME_backend: backend
@@ -52,6 +52,12 @@ jobs:
             # mandatory
             -Dsonar.projectKey=todo-app
 
+      - name: Debug OIDC token claims
+        run: |
+          curl -sSL -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" \
+            | python3 -c "import sys,json,base64; t=json.load(sys.stdin)['value'].split('.')[1]; t+='='*(-len(t)%4); c=json.loads(base64.urlsafe_b64decode(t)); print({k:c[k] for k in ('iss','aud','sub')})"
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         env:
@@ -63,7 +69,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
