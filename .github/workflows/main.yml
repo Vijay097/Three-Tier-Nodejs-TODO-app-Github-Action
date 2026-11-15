@@ -12,8 +12,8 @@ env:
   ECS_SERVICE_FRONTEND: ${{ vars.ECS_SERVICE_FRONTEND }}
   ECS_SERVICE_BACKEND: ${{ vars.ECS_SERVICE_BACKEND }} # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION_FRONTEND: MY_ECS_TASK_DEFINITION
-  ECS_TASK_DEFINITION_BACKEND: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+  ECS_TASK_DEFINITION_FRONTEND: frontend-task-def.json
+  ECS_TASK_DEFINITION_BACKEND: backend-task-def.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME_frontend: frontend
   CONTAINER_NAME_backend: backend
