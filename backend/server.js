@@ -16,6 +16,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 5432,
+  ssl: { rejectUnauthorized: false },
 });
 
 // Day 18: Mandatory Security / Table Initialisation
