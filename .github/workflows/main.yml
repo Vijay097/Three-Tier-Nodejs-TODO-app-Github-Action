@@ -52,6 +52,12 @@ jobs:
             # mandatory
             -Dsonar.projectKey=todo-app
 
+      - name: Debug OIDC token claims
+        run: |
+          curl -sSL -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" \
+            | python3 -c "import sys,json,base64; t=json.load(sys.stdin)['value'].split('.')[1]; t+='='*(-len(t)%4); c=json.loads(base64.urlsafe_b64decode(t)); print({k:c[k] for k in ('iss','aud','sub')})"
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         env:
