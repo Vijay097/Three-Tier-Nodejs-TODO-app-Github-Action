@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // Dynamically sets the backend URL based on Vite runtime environment injection
-const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');';
+const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 function App() {
   const [todos, setTodos] = useState([]);
