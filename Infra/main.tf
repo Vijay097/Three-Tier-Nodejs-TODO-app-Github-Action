@@ -284,7 +284,8 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:sub" = [
             "repo:Vijay097@42915631/Three-Tier-Nodejs-TODO-app-Github-Action@1448185490:ref:refs/heads/main",
             "repo:${var.github_repo}:ref:refs/heads/main"
-          }
+            ]
+         }
         }
       }
     ]
